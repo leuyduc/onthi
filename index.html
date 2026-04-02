@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Guide – Quản trị hệ thống mạng CNTT 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e2a;
+    --border: #252b3b;
+    --text: #c8d0e8;
+    --text2: #7a85a0;
+    --accent: #4fc3f7;
+    --accent2: #7c4dff;
+    --green: #69ff9a;
+    --orange: #ffb74d;
+    --red: #ff6b6b;
+    --yellow: #ffe082;
+    --linux: #69ff9a;
+    --win: #4fc3f7;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: 270px; min-width: 270px; background: var(--bg2);
+    border-right: 1px solid var(--border); overflow-y: auto;
+    display: flex; flex-direction: column;
+    padding-bottom: 20px;
+  }
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .sidebar-header {
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--bg2); z-index: 10;
+  }
+  .sidebar-header h1 { font-size: 13px; font-weight: 800; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; line-height: 1.4; }
+  .sidebar-header p { font-size: 10px; color: var(--text2); margin-top: 4px; font-family: var(--mono); }
+
+  .nav-section { padding: 10px 0 4px; }
+  .nav-section-label {
+    padding: 6px 16px 4px; font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 2px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-section-label.linux { color: var(--linux); }
+  .nav-section-label.win { color: var(--win); }
+  .nav-section-label.overview { color: var(--orange); }
+  .nav-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .nav-item {
+    padding: 7px 16px 7px 24px; cursor: pointer; font-size: 12px;
+    color: var(--text2); display: flex; align-items: center; gap: 8px;
+    border-left: 2px solid transparent; transition: all .15s;
+    font-family: var(--mono);
+  }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: var(--bg3); color: var(--accent); border-left-color: var(--accent); }
+  .nav-item .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .nav-item .dot.linux { background: var(--linux); }
+  .nav-item .dot.win { background: var(--win); }
+  .nav-item .dot.orange { background: var(--orange); }
+
+  .nav-sub { padding-left: 36px; font-size: 11px; color: var(--text2); cursor: pointer; padding-top: 4px; padding-bottom: 4px; }
+  .nav-sub:hover { color: var(--text); }
+
+  /* MAIN */
+  #main { flex: 1; overflow-y: auto; padding: 0; }
+  #main::-webkit-scrollbar { width: 5px; }
+  #main::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .page { display: none; padding: 28px 32px 48px; max-width: 960px; }
+  .page.active { display: block; }
+
+  /* PAGE HEADER */
+  .page-header { margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+  .page-header .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 3px 10px; border-radius: 4px; margin-bottom: 10px; font-family: var(--mono);
+  }
+  .tag.linux { background: rgba(105,255,154,.12); color: var(--linux); border: 1px solid rgba(105,255,154,.25); }
+  .tag.win { background: rgba(79,195,247,.12); color: var(--win); border: 1px solid rgba(79,195,247,.25); }
+  .tag.overview { background: rgba(255,183,77,.12); color: var(--orange); border: 1px solid rgba(255,183,77,.25); }
+  .page-header h2 { font-size: 24px; font-weight: 800; color: #fff; line-height: 1.2; }
+  .page-header p { font-size: 13px; color: var(--text2); margin-top: 6px; font-family: var(--mono); }
+
+  /* STEP */
+  .step-group { margin-bottom: 28px; }
+  .step-group-title {
+    font-size: 13px; font-weight: 700; color: var(--yellow);
+    padding: 8px 12px; background: rgba(255,224,130,.07);
+    border-left: 3px solid var(--yellow); margin-bottom: 12px;
+    border-radius: 0 4px 4px 0; text-transform: uppercase; letter-spacing: .5px;
+  }
+
+  .step {
+    display: flex; gap: 12px; margin-bottom: 14px;
+  }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; font-family: var(--mono);
+    margin-top: 2px;
+  }
+  .step-num.linux { background: rgba(105,255,154,.2); color: var(--linux); }
+  .step-num.win { background: rgba(79,195,247,.2); color: var(--win); }
+  .step-body { flex: 1; }
+  .step-body p { font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 6px; }
+  .step-body .note { font-size: 11px; color: var(--text2); font-style: italic; margin-top: 4px; }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: #08090d; border: 1px solid var(--border);
+    border-radius: 6px; margin: 8px 0; overflow: hidden; position: relative;
+  }
+  .code-block .code-header {
+    padding: 6px 12px; background: var(--bg3);
+    font-size: 10px; color: var(--text2); font-family: var(--mono);
+    border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+  }
+  .code-block .code-header .filename { color: var(--accent2); }
+  .copy-btn {
+    background: none; border: 1px solid var(--border); color: var(--text2);
+    font-size: 9px; padding: 2px 8px; border-radius: 3px; cursor: pointer;
+    font-family: var(--mono); transition: all .15s; text-transform: uppercase;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
+  pre {
+    padding: 14px 16px; font-family: var(--mono); font-size: 12px;
+    line-height: 1.7; overflow-x: auto; white-space: pre;
+    color: var(--text);
+  }
+  .cmd { color: #a8d8ff; }
+  .cmt { color: #4a5568; font-style: italic; }
+  .str { color: #ffd080; }
+  .kw { color: var(--accent2); }
+  .val { color: var(--green); }
+  .file-path { color: var(--orange); }
+
+  /* INLINE CODE */
+  code {
+    font-family: var(--mono); font-size: 12px;
+    background: rgba(79,195,247,.1); color: var(--accent);
+    padding: 1px 6px; border-radius: 3px;
+  }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--mono); margin: 12px 0; }
+  th { background: var(--bg3); color: var(--text2); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid rgba(37,43,59,.5); vertical-align: top; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  .badge {
+    display: inline-block; font-size: 10px; padding: 1px 7px;
+    border-radius: 3px; font-weight: 700;
+  }
+  .badge.linux { background: rgba(105,255,154,.15); color: var(--linux); }
+  .badge.win { background: rgba(79,195,247,.15); color: var(--win); }
+
+  /* WARNING / INFO BOX */
+  .box { border-radius: 6px; padding: 12px 14px; margin: 10px 0; font-size: 12px; line-height: 1.6; }
+  .box.info { background: rgba(79,195,247,.08); border-left: 3px solid var(--accent); color: var(--text); }
+  .box.warn { background: rgba(255,183,77,.08); border-left: 3px solid var(--orange); color: var(--text); }
+  .box.danger { background: rgba(255,107,107,.08); border-left: 3px solid var(--red); color: var(--text); }
+  .box.success { background: rgba(105,255,154,.08); border-left: 3px solid var(--green); color: var(--text); }
+  .box strong { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .box.info strong { color: var(--accent); }
+  .box.warn strong { color: var(--orange); }
+  .box.danger strong { color: var(--red); }
+  .box.success strong { color: var(--green); }
+
+  /* DIAGRAM */
+  .diagram-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 16px 0; overflow-x: auto; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin: 8px 0; }
+  .checklist li { padding: 5px 0; font-size: 12px; color: var(--text2); display: flex; align-items: flex-start; gap: 8px; font-family: var(--mono); }
+  .checklist li::before { content: '☐'; color: var(--border); margin-top: 1px; flex-shrink: 0; }
+  .checklist li span { color: var(--text); }
+
+  /* SECTION DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+  /* WIN STEP PATH */
+  .gui-path { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+  .gui-path span { color: var(--win); }
+  .gui-path .arr { color: var(--border); margin: 0 4px; }
+
+  h3 { font-size: 14px; font-weight: 700; color: var(--text); margin: 20px 0 10px; }
+  h4 { font-size: 12px; font-weight: 700; color: var(--text2); margin: 14px 0 6px; text-transform: uppercase; letter-spacing: .5px; }
+
+  /* RESPONSIVE */
+  @media(max-width: 768px) {
+    #sidebar { width: 200px; min-width: 200px; }
+    .page { padding: 20px 16px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <h1>Lab Guide<br>QTHTM 2026</h1>
+    <p>v1.0 · 300 phút · offline</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label overview">Tổng quan</div>
+    <div class="nav-item active" onclick="show('overview')"><span class="dot orange"></span> Topology & IP Table</div>
+    <div class="nav-item" onclick="show('credentials')"><span class="dot orange"></span> Thông tin đăng nhập</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label linux">Module 1 – Linux</div>
+    <div class="nav-item" onclick="show('fw01')"><span class="dot linux"></span> fw01.hcmc.vn</div>
+    <div class="nav-item" onclick="show('srv')"><span class="dot linux"></span> srv.hcmc.vn</div>
+    <div class="nav-item" onclick="show('dns')"><span class="dot linux"></span> dns.hcmc.vn</div>
+    <div class="nav-item" onclick="show('client')"><span class="dot linux"></span> client.hcmc.vn</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label win">Module 2 – Windows</div>
+    <div class="nav-item" onclick="show('dc')"><span class="dot win"></span> DC.vnsc.vn</div>
+    <div class="nav-item" onclick="show('fw02')"><span class="dot win"></span> fw02.vnsc.vn</div>
+    <div class="nav-item" onclick="show('worker')"><span class="dot win"></span> worker.vnsc.vn</div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+<!-- ==================== OVERVIEW ==================== -->
+<div id="page-overview" class="page active">
+  <div class="page-header">
+    <div class="tag overview">Tổng quan</div>
+    <h2>Topology & Bảng địa chỉ IP</h2>
+    <p>HỘI THI HỌC SINH SINH VIÊN GIỎI NGHỀ – Lần 16, 2026</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 820 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:820px;display:block;margin:0 auto">
+      <!-- Background zones -->
+      <rect x="10" y="10" width="370" height="360" rx="10" fill="rgba(105,255,154,.04)" stroke="rgba(105,255,154,.2)" stroke-width="1.5"/>
+      <rect x="440" y="10" width="370" height="360" rx="10" fill="rgba(79,195,247,.04)" stroke="rgba(79,195,247,.2)" stroke-width="1.5"/>
+
+      <!-- Zone labels -->
+      <text x="195" y="35" text-anchor="middle" fill="rgba(105,255,154,.7)" font-size="11" font-family="JetBrains Mono,monospace" font-weight="700">hcmc.vn – Linux Environment</text>
+      <text x="625" y="35" text-anchor="middle" fill="rgba(79,195,247,.7)" font-size="11" font-family="JetBrains Mono,monospace" font-weight="700">vnsc.vn – Windows Environment</text>
+
+      <!-- Internet cloud -->
+      <ellipse cx="412" cy="195" rx="28" ry="22" fill="rgba(122,133,160,.15)" stroke="rgba(122,133,160,.4)" stroke-width="1.5"/>
+      <text x="412" y="190" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">INTERNET</text>
+      <text x="412" y="202" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">210.103.5.0/26</text>
+
+      <!-- Linux servers -->
+      <!-- dns.hcmc.vn -->
+      <rect x="25" y="50" width="140" height="58" rx="6" fill="rgba(13,15,20,.8)" stroke="rgba(105,255,154,.4)" stroke-width="1.5"/>
+      <text x="95" y="68" text-anchor="middle" fill="#69ff9a" font-size="10" font-family="JetBrains Mono,monospace" font-weight="700">dns.hcmc.vn</text>
+      <text x="95" y="81" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">192.168.1.2/24</text>
+      <text x="95" y="93" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">DNS · Web · FTP · CA</text>
+
+      <!-- srv.hcmc.vn -->
+      <rect x="25" y="150" width="140" height="58" rx="6" fill="rgba(13,15,20,.8)" stroke="rgba(105,255,154,.4)" stroke-width="1.5"/>
+      <text x="95" y="168" text-anchor="middle" fill="#69ff9a" font-size="10" font-family="JetBrains Mono,monospace" font-weight="700">srv.hcmc.vn</text>
+      <text x="95" y="181" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">192.168.1.1/24</text>
+      <text x="95" y="193" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">LDAP · RADIUS · Cacti · Mail</text>
+
+      <!-- client.hcmc.vn -->
+      <rect x="25" y="255" width="140" height="58" rx="6" fill="rgba(13,15,20,.8)" stroke="rgba(105,255,154,.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="95" y="273" text-anchor="middle" fill="#69ff9a" font-size="10" font-family="JetBrains Mono,monospace" font-weight="700">client.hcmc.vn</text>
+      <text x="95" y="286" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">DHCP: 192.168.1.100</text>
+      <text x="95" y="298" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">LDAP Client · Firefox · TBird</text>
+
+      <!-- fw01.hcmc.vn -->
+      <rect x="195" y="155" width="145" height="80" rx="6" fill="rgba(13,15,20,.8)" stroke="rgba(255,224,130,.5)" stroke-width="2"/>
+      <text x="267" y="175" text-anchor="middle" fill="#ffe082" font-size="10" font-family="JetBrains Mono,monospace" font-weight="700">fw01.hcmc.vn</text>
+      <text x="267" y="188" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">192.168.1.254/24</text>
+      <text x="267" y="200" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">210.103.5.1/26</text>
+      <text x="267" y="213" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">Routing · NAT · VPN · DHCP</text>
+      <text x="267" y="226" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">nftables · StrongSwan</text>
+
+      <!-- Windows servers -->
+      <!-- DC.vnsc.vn -->
+      <rect x="645" y="50" width="155" height="72" rx="6" fill="rgba(13,15,20,.8)" stroke="rgba(79,195,247,.4)" stroke-width="1.5"/>
+      <text x="722" y="68" text-anchor="middle" fill="#4fc3f7" font-size="10" font-family="JetBrains Mono,monospace" font-weight="700">DC.vnsc.vn</text>
+      <text x="722" y="81" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">172.16.1.1/24</text>
+      <text x="722" y="94" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">AD DS · DNS · GPO · CA</text>
+      <text x="722" y="107" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">ADFS · RDS · File Server</text>
+
+      <!-- worker.vnsc.vn -->
+      <rect x="645" y="260" width="155" height="58" rx="6" fill="rgba(13,15,20,.8)" stroke="rgba(79,195,247,.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="722" y="278" text-anchor="middle" fill="#4fc3f7" font-size="10" font-family="JetBrains Mono,monospace" font-weight="700">worker.vnsc.vn</text>
+      <text x="722" y="291" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">DHCP: 172.16.2.100</text>
+      <text x="722" y="304" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">Win11 · Domain · TBird</text>
+
+      <!-- fw02.vnsc.vn -->
+      <rect x="460" y="150" width="155" height="88" rx="6" fill="rgba(13,15,20,.8)" stroke="rgba(255,224,130,.5)" stroke-width="2"/>
+      <text x="537" y="170" text-anchor="middle" fill="#ffe082" font-size="10" font-family="JetBrains Mono,monospace" font-weight="700">fw02.vnsc.vn</text>
+      <text x="537" y="183" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">172.16.1.254/24</text>
+      <text x="537" y="196" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">172.16.2.254/24</text>
+      <text x="537" y="209" text-anchor="middle" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">210.103.5.2/26</text>
+      <text x="537" y="222" text-anchor="middle" fill="#7a85a0" font-size="8" font-family="JetBrains Mono,monospace">RRAS · DHCP · IKEv2</text>
+
+      <!-- Connection lines -->
+      <!-- Linux internal -->
+      <line x1="165" y1="79" x2="195" y2="185" stroke="rgba(105,255,154,.3)" stroke-width="1.5"/>
+      <line x1="165" y1="179" x2="195" y2="195" stroke="rgba(105,255,154,.3)" stroke-width="1.5"/>
+      <line x1="165" y1="284" x2="195" y2="210" stroke="rgba(105,255,154,.3)" stroke-width="1.2" stroke-dasharray="4,3"/>
+
+      <!-- fw01 to Internet -->
+      <line x1="340" y1="195" x2="384" y2="195" stroke="rgba(255,224,130,.5)" stroke-width="2"/>
+      <!-- fw02 to Internet -->
+      <line x1="460" y1="195" x2="440" y2="195" stroke="rgba(255,224,130,.5)" stroke-width="2"/>
+
+      <!-- S2S VPN line -->
+      <line x1="340" y1="185" x2="460" y2="185" stroke="rgba(124,77,255,.5)" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <text x="400" y="178" text-anchor="middle" fill="rgba(124,77,255,.8)" font-size="8" font-family="JetBrains Mono,monospace">IKEv2 S2S VPN</text>
+
+      <!-- Windows internal -->
+      <line x1="615" y1="86" x2="615" y2="150" stroke="rgba(79,195,247,.3)" stroke-width="1.5"/>
+      <line x1="615" y1="150" x2="645" y2="150" stroke="rgba(79,195,247,.3)" stroke-width="1.5"/>
+      <line x1="615" y1="289" x2="615" y2="238" stroke="rgba(79,195,247,.3)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="615" y1="238" x2="645" y2="238" stroke="rgba(79,195,247,.3)" stroke-width="1.2" stroke-dasharray="4,3"/>
+
+      <!-- Legend -->
+      <line x1="25" y1="342" x2="55" y2="342" stroke="rgba(105,255,154,.4)" stroke-width="1.5"/>
+      <text x="60" y="346" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">Linux Network</text>
+      <line x1="135" y1="342" x2="165" y2="342" stroke="rgba(79,195,247,.4)" stroke-width="1.5"/>
+      <text x="170" y="346" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">Windows Network</text>
+      <line x1="255" y1="342" x2="285" y2="342" stroke="rgba(124,77,255,.5)" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="290" y="346" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">VPN Tunnel</text>
+      <line x1="355" y1="342" x2="385" y2="342" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="390" y="346" fill="#7a85a0" font-size="9" font-family="JetBrains Mono,monospace">DHCP Client</text>
+    </svg>
+  </div>
+
+  <h3>Bảng cấu hình máy chủ</h3>
+  <table>
+    <thead><tr><th>FQDN</th><th>IP Address</th><th>Dịch vụ</th><th>OS</th></tr></thead>
+    <tbody>
+      <tr><td><code>fw01.hcmc.vn</code></td><td>192.168.1.254/24<br>210.103.5.1/26</td><td>Routing, NAT, VPN, DHCP</td><td><span class="badge linux">Debian 12.13 CUI</span></td></tr>
+      <tr><td><code>srv.hcmc.vn</code></td><td>192.168.1.1/24</td><td>OpenLDAP, FreeRADIUS, SNMP, Cacti, Mail</td><td><span class="badge linux">Debian 12.13 CUI</span></td></tr>
+      <tr><td><code>dns.hcmc.vn</code></td><td>192.168.1.2/24</td><td>DNS, WEB, FTP, CA</td><td><span class="badge linux">Debian 12.13 CUI</span></td></tr>
+      <tr><td><code>client.hcmc.vn</code></td><td>DHCP (192.168.1.100)</td><td>LDAP Client, Browser, Mail</td><td><span class="badge linux">Debian 12.13 GUI</span></td></tr>
+      <tr><td><code>fw02.vnsc.vn</code></td><td>172.16.1.254/24<br>172.16.2.254/24<br>210.103.5.2/26</td><td>RRAS, DHCP, VPN</td><td><span class="badge win">Win Server 2022 CUI</span></td></tr>
+      <tr><td><code>DC.vnsc.vn</code></td><td>172.16.1.1/24</td><td>AD, DNS, GPO, CA, ADFS, RDS, FS</td><td><span class="badge win">Win Server 2022 GUI</span></td></tr>
+      <tr><td><code>worker.vnsc.vn</code></td><td>DHCP (172.16.2.100)</td><td>Domain Client</td><td><span class="badge win">Windows 11 GUI</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Bảng Networks</h3>
+  <table>
+    <thead><tr><th>Network</th><th>CIDR</th><th>Domain</th></tr></thead>
+    <tbody>
+      <tr><td>hcmc.vn Internal</td><td>192.168.1.0/24</td><td>hcmc.vn</td></tr>
+      <tr><td>vnsc.vn Internal</td><td>172.16.1.0/24<br>172.16.2.0/24</td><td>vnsc.vn</td></tr>
+      <tr><td>Public Internet</td><td>210.103.5.0/26</td><td>—</td></tr>
+      <tr><td>Remote Access VPN Pool</td><td>192.168.3.0/24</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== CREDENTIALS ==================== -->
+<div id="page-credentials" class="page">
+  <div class="page-header">
+    <div class="tag overview">Credentials</div>
+    <h2>Thông tin đăng nhập & Users</h2>
+  </div>
+  <table>
+    <thead><tr><th>Loại</th><th>Username</th><th>Password</th><th>Ghi chú</th></tr></thead>
+    <tbody>
+      <tr><td>Linux root</td><td>root</td><td>Qthtm!2026</td><td>Tất cả Linux servers</td></tr>
+      <tr><td>Linux user</td><td>user</td><td>Qthtm!2026</td><td></td></tr>
+      <tr><td>Windows Admin</td><td>Administrator</td><td>Qthtm!2026</td><td>Fallback: P@ssw0rd</td></tr>
+      <tr><td>LDAP User</td><td>james</td><td>Qthtm!2026</td><td>james@hcmc.vn</td></tr>
+      <tr><td>LDAP User</td><td>donald</td><td>Qthtm!2026</td><td>donald@hcmc.vn</td></tr>
+      <tr><td>Cacti Admin</td><td>admin</td><td>Qthtm!2026</td><td>monitor.hcmc.vn/monitor</td></tr>
+      <tr><td>RADIUS Shared Secret</td><td>—</td><td>Qthtm!2026</td><td>fw01 ↔ FreeRADIUS</td></tr>
+    </tbody>
+  </table>
+  <div class="box warn"><strong>⚠ Lưu ý</strong>Nếu Group Policy chặn password trên Windows, dùng <code>P@ssw0rd</code> thay cho <code>Qthtm!2026</code></div>
+</div>
+
+<!-- ==================== FW01 ==================== -->
+<div id="page-fw01" class="page">
+  <div class="page-header">
+    <div class="tag linux">Linux · Debian 12.13 CUI</div>
+    <h2>fw01.hcmc.vn</h2>
+    <p>192.168.1.254/24 · 210.103.5.1/26 — Routing · NAT · VPN · DHCP</p>
+  </div>
+
+  <!-- 1. HOSTNAME & NETWORK -->
+  <div class="step-group">
+    <div class="step-group-title">0 · Cấu hình ban đầu – Hostname & Network</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Đặt hostname và cấu hình mạng</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">hostnamectl</span> set-hostname fw01.hcmc.vn
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/network/interfaces</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Interface nội bộ</span>
+auto eth0
+iface eth0 inet static
+  address 192.168.1.254
+  netmask 255.255.255.0
+
+<span class="cmt"># Interface public (internet)</span>
+auto eth1
+iface eth1 inet static
+  address 210.103.5.1
+  netmask 255.255.255.192
+  gateway 210.103.5.62
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># apply</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">systemctl</span> restart networking
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- 2. ROUTING -->
+  <div class="step-group">
+    <div class="step-group-title">1 · Routing – IP Forwarding & Static Routes</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Bật IP forwarding vĩnh viễn</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/sysctl.d/99-routing.conf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+net.ipv4.ip_forward = 1
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># apply</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">sysctl</span> -p /etc/sysctl.d/99-routing.conf
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Cấu hình static routes đến mạng <code>vnsc.vn</code> (172.16.0.0/16 qua tunnel)</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/network/interfaces – thêm vào eth0</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Static route đến vnsc.vn (qua VPN tunnel – sẽ active sau khi VPN lên)</span>
+up ip route add 172.16.1.0/24 via 210.103.5.2 dev eth1
+up ip route add 172.16.2.0/24 via 210.103.5.2 dev eth1
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- 3. NAT / nftables -->
+  <div class="step-group">
+    <div class="step-group-title">2 · NAT – nftables (PAT · Port-Forward · Static NAT · Firewall · Logging)</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Cài đặt nftables</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># install</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install nftables -y
+<span class="cmd">systemctl</span> enable --now nftables
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Tạo ruleset hoàn chỉnh cho nftables</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/nftables.conf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt">#!/usr/sbin/nft -f
+# fw01.hcmc.vn – nftables ruleset
+# Variables: ETH_IN=eth0(192.168.1.0/24) ETH_OUT=eth1(public)</span>
+
+flush ruleset
+
+define ETH_IN  = eth0
+define ETH_OUT = eth1
+define NET_HCMC   = 192.168.1.0/24
+define IP_DNS     = 192.168.1.2
+define IP_SRV     = 192.168.1.1
+define IP_FW01_PUB = 210.103.5.1
+define IP_FW02_PUB = 210.103.5.2
+
+table inet filter {
+
+  chain input {
+    type filter hook input priority 0; policy drop;
+
+    <span class="cmt"># Allow established/related</span>
+    ct state established,related accept comment "Allow established"
+
+    <span class="cmt"># Allow loopback</span>
+    iifname lo accept
+
+    <span class="cmt"># Allow ICMP</span>
+    ip protocol icmp accept comment "Allow ICMP"
+
+    <span class="cmt"># Allow DHCP (DNS server sẽ update DDNS)</span>
+    iifname $ETH_IN udp dport 67 accept comment "DHCP server"
+
+    <span class="cmt"># Allow SSH từ nội bộ</span>
+    iifname $ETH_IN tcp dport 22 accept comment "SSH internal"
+
+    <span class="cmt"># Allow IKEv2 VPN</span>
+    udp dport {500, 4500} accept comment "IKEv2 VPN"
+
+    <span class="cmt"># Từ dns.hcmc.vn – chỉ traffic cần thiết cho DNS</span>
+    ip saddr $IP_DNS udp dport 53 accept
+    ip saddr $IP_DNS tcp dport 53 accept
+
+    <span class="cmt"># Drop + log tất cả còn lại</span>
+    log prefix "[FW01-DROP-IN] " drop comment "Log dropped inbound"
+  }
+
+  chain forward {
+    type filter hook forward priority 0; policy drop;
+
+    ct state established,related accept
+    ip protocol icmp accept
+
+    <span class="cmt"># hcmc.vn -> internet</span>
+    iifname $ETH_IN oifname $ETH_OUT ip saddr $NET_HCMC accept comment "LAN to WAN"
+
+    <span class="cmt"># DNS traffic từ internet vào dns.hcmc.vn</span>
+    iifname $ETH_OUT oifname $ETH_IN ip daddr $IP_DNS tcp dport 53 accept
+    iifname $ETH_OUT oifname $ETH_IN ip daddr $IP_DNS udp dport 53 accept
+
+    <span class="cmt"># Port forwarding: HTTPS -> dns.hcmc.vn (web)</span>
+    iifname $ETH_OUT oifname $ETH_IN ip daddr $IP_DNS tcp dport 443 accept
+    <span class="cmt"># Port forwarding: FTP -> dns.hcmc.vn</span>
+    iifname $ETH_OUT oifname $ETH_IN ip daddr $IP_DNS tcp dport {20,21} accept
+    <span class="cmt"># Port forwarding: Mail (SMTPS/IMAPS) -> srv.hcmc.vn</span>
+    iifname $ETH_OUT oifname $ETH_IN ip daddr $IP_SRV tcp dport {465,993} accept
+
+    <span class="cmt"># VPN traffic (Site-to-Site)</span>
+    iifname $ETH_OUT ip saddr $IP_FW02_PUB accept comment "S2S VPN peer"
+
+    log prefix "[FW01-DROP-FWD] " drop comment "Log dropped forward"
+  }
+
+  chain output {
+    type filter hook output priority 0; policy accept;
+  }
+}
+
+table ip nat {
+
+  chain prerouting {
+    type nat hook prerouting priority -100;
+
+    <span class="cmt"># Port Forwarding: DNS từ public về dns.hcmc.vn</span>
+    iifname $ETH_OUT udp dport 53 dnat to $IP_DNS:53 comment "DNAT DNS UDP"
+    iifname $ETH_OUT tcp dport 53 dnat to $IP_DNS:53 comment "DNAT DNS TCP"
+
+    <span class="cmt"># Port Forwarding: HTTPS -> web.hcmc.vn (dns server)</span>
+    iifname $ETH_OUT tcp dport 443 dnat to $IP_DNS:443 comment "DNAT HTTPS"
+
+    <span class="cmt"># Port Forwarding: FTP -> dns.hcmc.vn</span>
+    iifname $ETH_OUT tcp dport 21 dnat to $IP_DNS:21 comment "DNAT FTP"
+
+    <span class="cmt"># Port Forwarding: Mail</span>
+    iifname $ETH_OUT tcp dport 465 dnat to $IP_SRV:465 comment "DNAT SMTPS"
+    iifname $ETH_OUT tcp dport 993 dnat to $IP_SRV:993 comment "DNAT IMAPS"
+  }
+
+  chain postrouting {
+    type nat hook postrouting priority 100;
+
+    <span class="cmt"># PAT: toàn bộ hcmc.vn ra internet</span>
+    ip saddr $NET_HCMC oifname $ETH_OUT masquerade comment "PAT LAN"
+
+    <span class="cmt"># Static NAT: fw01 -> public IP cố định</span>
+    ip saddr 192.168.1.254 oifname $ETH_OUT snat to $IP_FW01_PUB comment "Static NAT fw01"
+  }
+}
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">3</div><div class="step-body">
+      <p>Apply ruleset và kiểm tra</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># apply & verify</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">nft</span> -f /etc/nftables.conf
+<span class="cmd">nft</span> list ruleset
+<span class="cmd">systemctl</span> restart nftables
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- 4. DHCP -->
+  <div class="step-group">
+    <div class="step-group-title">3 · DHCP Server – isc-dhcp-server (với DDNS)</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Cài đặt DHCP server</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># install</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install isc-dhcp-server -y
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Cấu hình interface cho DHCP</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/default/isc-dhcp-server</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+INTERFACESv4="eth0"
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">3</div><div class="step-body">
+      <p>Tạo TSIG key cho DDNS (dùng chung với BIND)</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># tạo TSIG key</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">tsig-keygen</span> -a hmac-sha256 ddns-key > /etc/dhcp/ddns-key.conf
+<span class="cmd">cat</span> /etc/dhcp/ddns-key.conf  <span class="cmt"># copy key để dùng trong BIND</span>
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">4</div><div class="step-body">
+      <p>Cấu hình <code>/etc/dhcp/dhcpd.conf</code></p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/dhcp/dhcpd.conf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># TSIG key (giống key trong BIND)</span>
+include "/etc/dhcp/ddns-key.conf";
+
+<span class="cmt"># DDNS settings</span>
+ddns-updates on;
+ddns-update-style interim;
+update-static-leases on;
+ignore client-updates;
+
+zone hcmc.vn. {
+  primary 192.168.1.2;
+  key ddns-key;
+}
+zone 1.168.192.in-addr.arpa. {
+  primary 192.168.1.2;
+  key ddns-key;
+}
+
+<span class="cmt"># Global options</span>
+authoritative;
+default-lease-time 86400;
+max-lease-time 172800;
+
+subnet 192.168.1.0 netmask 255.255.255.0 {
+  range 192.168.1.50 192.168.1.150;
+  option domain-name "hcmc.vn";
+  option domain-name-servers 192.168.1.2;
+  option routers 192.168.1.254;
+  option broadcast-address 192.168.1.255;
+
+  <span class="cmt"># Static reservation cho client.hcmc.vn</span>
+  host client.hcmc.vn {
+    hardware ethernet <span class="val">AA:BB:CC:DD:EE:FF</span>;  <span class="cmt"># thay MAC thực tế</span>
+    fixed-address 192.168.1.100;
+    option host-name "client";
+  }
+}
+</pre></div>
+      <p class="note">⚠ Thay <code>AA:BB:CC:DD:EE:FF</code> bằng MAC thực tế của client: <code>ip link show</code> trên máy client</p>
+    </div></div>
+    <div class="step"><div class="step-num linux">5</div><div class="step-body">
+      <p>Khởi động dịch vụ</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># enable & start</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">systemctl</span> enable --now isc-dhcp-server
+<span class="cmd">systemctl</span> status isc-dhcp-server
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- 5. SITE-TO-SITE VPN -->
+  <div class="step-group">
+    <div class="step-group-title">4 · Site-to-Site VPN – IKEv2 (StrongSwan)</div>
+    <div class="box info"><strong>📋 Điều kiện tiên quyết</strong>Certificate từ HCMC-CA phải được tạo trên <code>dns.hcmc.vn</code> trước. Copy cert về <code>/etc/ipsec.d/</code></div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Cài đặt StrongSwan</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># install</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install strongswan strongswan-pki libcharon-extra-plugins -y
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Copy certificates từ CA</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># cấu trúc thư mục cert</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Từ dns.hcmc.vn copy về:</span>
+<span class="cmd">scp</span> root@192.168.1.2:/etc/ssl/CA/Root-CA.crt /etc/ipsec.d/cacerts/
+<span class="cmd">scp</span> root@192.168.1.2:/etc/ssl/certs/fw01.hcmc.vn.crt /etc/ipsec.d/certs/
+<span class="cmd">scp</span> root@192.168.1.2:/etc/ssl/private/fw01.hcmc.vn.key /etc/ipsec.d/private/
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">3</div><div class="step-body">
+      <p>Cấu hình <code>/etc/ipsec.conf</code></p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/ipsec.conf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+config setup
+  charondebug="ike 1, knl 1, cfg 1"
+
+<span class="cmt"># Site-to-Site VPN đến fw02.vnsc.vn</span>
+conn hcmc-to-vnsc
+  keyexchange=ikev2
+  left=210.103.5.1
+  leftid=fw01.hcmc.vn
+  leftcert=fw01.hcmc.vn.crt
+  leftsubnet=192.168.1.0/24
+  right=210.103.5.2
+  rightid=fw02.vnsc.vn
+  rightsubnet=172.16.1.0/24,172.16.2.0/24
+  ike=aes256-sha256-modp2048!
+  esp=aes256-sha256!
+  auto=start
+  dpdaction=restart
+  authby=rsasig
+
+<span class="cmt"># Remote Access VPN (IKEv2 + EAP)</span>
+conn vpn-remote-access
+  keyexchange=ikev2
+  left=210.103.5.1
+  leftid=vpn.hcmc.vn
+  leftcert=vpn.hcmc.vn.crt
+  leftsubnet=192.168.1.0/24,172.16.1.0/24,172.16.2.0/24
+  leftsendcert=always
+  right=%any
+  rightsendcert=never
+  rightauth=eap-radius
+  rightsourceip=192.168.3.0/24
+  eap_identity=%any
+  auto=add
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">4</div><div class="step-body">
+      <p>Cấu hình <code>/etc/ipsec.secrets</code></p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/ipsec.secrets</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+: RSA fw01.hcmc.vn.key
+: RSA vpn.hcmc.vn.key
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">5</div><div class="step-body">
+      <p>Cấu hình RADIUS cho EAP (Remote Access VPN)</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/strongswan.d/charon/eap-radius.conf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+eap-radius {
+  servers {
+    hcmc-radius {
+      address = 192.168.1.1
+      secret = Qthtm!2026
+    }
+  }
+}
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">6</div><div class="step-body">
+      <p>Khởi động IPsec</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># start</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">systemctl</span> enable --now strongswan-starter
+<span class="cmd">ipsec</span> up hcmc-to-vnsc
+<span class="cmd">ipsec</span> statusall
+</pre></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== SRV ==================== -->
+<div id="page-srv" class="page">
+  <div class="page-header">
+    <div class="tag linux">Linux · Debian 12.13 CUI</div>
+    <h2>srv.hcmc.vn</h2>
+    <p>192.168.1.1/24 — OpenLDAP · FreeRADIUS · SNMP · Cacti · Mail</p>
+  </div>
+
+  <!-- OPENLDAP -->
+  <div class="step-group">
+    <div class="step-group-title">1 · OpenLDAP Server</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Cài đặt OpenLDAP</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># install</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install slapd ldap-utils -y
+<span class="cmt"># Trong quá trình cài sẽ hỏi admin password: Qthtm!2026</span>
+<span class="cmd">dpkg-reconfigure</span> slapd
+<span class="cmt"># DNS domain: hcmc.vn | Organization: HCMC | Password: Qthtm!2026
+# Backend: MDB | Remove db on purge: No | Move old db: Yes</span>
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Tắt anonymous access và tắt plaintext (enforce TLS)</p>
+      <div class="code-block"><div class="code-header"><span class="filename">disable-anon.ldif</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+dn: cn=config
+changetype: modify
+add: olcDisallows
+olcDisallows: bind_anon
+
+dn: cn=config
+changetype: modify
+add: olcRequires
+olcRequires: authc
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># apply</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">ldapmodify</span> -Y EXTERNAL -H ldapi:/// -f disable-anon.ldif
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">3</div><div class="step-body">
+      <p>Tạo OUs và Users (james, donald)</p>
+      <div class="code-block"><div class="code-header"><span class="filename">base.ldif</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># OU People</span>
+dn: ou=people,dc=hcmc,dc=vn
+objectClass: organizationalUnit
+ou: people
+
+<span class="cmt"># OU Groups</span>
+dn: ou=groups,dc=hcmc,dc=vn
+objectClass: organizationalUnit
+ou: groups
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename">users.ldif</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># User james</span>
+dn: uid=james,ou=people,dc=hcmc,dc=vn
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: james
+cn: James
+sn: James
+mail: james@hcmc.vn
+uidNumber: 2001
+gidNumber: 2001
+homeDirectory: /home/james
+loginShell: /bin/bash
+userPassword: {SSHA}&lt;hash&gt;
+
+<span class="cmt"># User donald</span>
+dn: uid=donald,ou=people,dc=hcmc,dc=vn
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: donald
+cn: Donald
+sn: Donald
+mail: donald@hcmc.vn
+uidNumber: 2002
+gidNumber: 2002
+homeDirectory: /home/donald
+loginShell: /bin/bash
+userPassword: {SSHA}&lt;hash&gt;
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># Tạo hash password và add user</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Tạo SSHA hash cho password</span>
+<span class="cmd">slappasswd</span> -s Qthtm!2026
+<span class="cmt"># Copy hash vào users.ldif thay cho &lt;hash&gt;</span>
+
+<span class="cmd">ldapadd</span> -x -D "cn=admin,dc=hcmc,dc=vn" -W -f base.ldif
+<span class="cmd">ldapadd</span> -x -D "cn=admin,dc=hcmc,dc=vn" -W -f users.ldif
+
+<span class="cmt"># Kiểm tra</span>
+<span class="cmd">ldapsearch</span> -x -D "cn=admin,dc=hcmc,dc=vn" -W -b "dc=hcmc,dc=vn" "(objectClass=person)"
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- FREERADIUS -->
+  <div class="step-group">
+    <div class="step-group-title">2 · FreeRADIUS (LDAP Backend)</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Cài đặt FreeRADIUS với LDAP module</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># install</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install freeradius freeradius-ldap -y
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Cấu hình LDAP module</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/freeradius/3.0/mods-available/ldap</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+ldap {
+  server = "ldap://127.0.0.1"
+  identity = "cn=admin,dc=hcmc,dc=vn"
+  password = Qthtm!2026
+  base_dn = "ou=people,dc=hcmc,dc=vn"
+  user {
+    base_dn = "${..base_dn}"
+    filter = "(uid=%{%{Stripped-User-Name}:-%{User-Name}})"
+  }
+  group {
+    base_dn = "ou=groups,dc=hcmc,dc=vn"
+    filter = "(objectClass=posixGroup)"
+  }
+}
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">3</div><div class="step-body">
+      <p>Enable LDAP module và cấu hình client (fw01)</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># enable module</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">ln</span> -s /etc/freeradius/3.0/mods-available/ldap /etc/freeradius/3.0/mods-enabled/
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/freeradius/3.0/clients.conf – thêm vào cuối</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+client fw01.hcmc.vn {
+  ipaddr = 192.168.1.254
+  secret = Qthtm!2026
+  shortname = fw01
+}
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">4</div><div class="step-body">
+      <p>Cấu hình inner-tunnel cho EAP-MSCHAPv2</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/freeradius/3.0/sites-available/inner-tunnel – thêm ldap vào authorize</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Trong section authorize {}, thêm ldap sau expiration:</span>
+ldap
+if (ok || updated) {
+  update control {
+    Auth-Type := LDAP
+  }
+}
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># restart & test</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">systemctl</span> enable --now freeradius
+<span class="cmt"># Test mode để debug</span>
+<span class="cmd">freeradius</span> -X
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- SNMP -->
+  <div class="step-group">
+    <div class="step-group-title">3 · SNMP Agent</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <div class="code-block"><div class="code-header"><span class="filename"># install & config</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install snmpd -y
+
+<span class="cmt"># Sửa /etc/snmp/snmpd.conf</span>
+<span class="cmd">sed</span> -i 's/^agentaddress.*/agentaddress udp:161/' /etc/snmp/snmpd.conf
+
+<span class="cmt"># Thêm community public</span>
+<span class="cmd">echo</span> 'rocommunity public 192.168.1.0/24' >> /etc/snmp/snmpd.conf
+
+<span class="cmd">systemctl</span> enable --now snmpd
+<span class="cmd">snmpwalk</span> -v2c -c public localhost system
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- CACTI -->
+  <div class="step-group">
+    <div class="step-group-title">4 · Cacti Monitoring</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Cài đặt dependencies và Cacti</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># install stack</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install apache2 mariadb-server php php-mysql php-snmp \
+  php-xml php-mbstring php-json php-gd rrdtool snmp \
+  cacti cacti-spine -y
+<span class="cmt"># Trong quá trình cài Cacti: chọn apache2, yes cấu hình DB</span>
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Cấu hình Apache alias <code>/monitor</code></p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/apache2/conf-available/cacti.conf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+Alias /monitor /usr/share/cacti/site
+&lt;Directory /usr/share/cacti/site&gt;
+    Options +FollowSymLinks
+    AllowOverride None
+    Require all granted
+&lt;/Directory&gt;
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># enable & restart</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">a2enconf</span> cacti
+<span class="cmd">systemctl</span> restart apache2
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">3</div><div class="step-body">
+      <p>Cấu hình DNS cho Cacti: thêm CNAME <code>monitor.hcmc.vn → srv.hcmc.vn</code> trên dns server</p>
+      <div class="box info"><strong>📋 Sau khi cài xong</strong>Vào <code>http://monitor.hcmc.vn/monitor</code> → Login admin / Qthtm!2026 → Console → Devices → thêm srv và DC → tạo graph Network Traffic → Build Tree by Host</div>
+    </div></div>
+  </div>
+
+  <!-- EMAIL -->
+  <div class="step-group">
+    <div class="step-group-title">5 · Email – Postfix (SMTPS) + Dovecot (IMAPS)</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Cài đặt Postfix và Dovecot</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># install</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install postfix dovecot-core dovecot-imapd postfix-ldap -y
+<span class="cmt"># Postfix config type: Internet Site | Domain: hcmc.vn</span>
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Cấu hình Postfix SMTPS</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/postfix/main.cf – các dòng quan trọng</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+myhostname = srv.hcmc.vn
+mydomain = hcmc.vn
+myorigin = $mydomain
+mydestination = $myhostname, localhost.$mydomain, $mydomain
+mynetworks = 192.168.1.0/24 127.0.0.0/8
+
+<span class="cmt"># TLS</span>
+smtpd_tls_cert_file = /etc/ssl/certs/srv.hcmc.vn.crt
+smtpd_tls_key_file = /etc/ssl/private/srv.hcmc.vn.key
+smtpd_tls_CAfile = /etc/ssl/CA/Root-CA.crt
+smtpd_use_tls = yes
+smtpd_tls_security_level = may
+
+<span class="cmt"># LDAP lookup</span>
+virtual_mailbox_domains = hcmc.vn
+virtual_transport = lmtp:unix:private/dovecot-lmtp
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/postfix/master.cf – enable smtps port 465</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+smtps     inet  n       -       y       -       -       smtpd
+  -o syslog_name=postfix/smtps
+  -o smtpd_tls_wrappermode=yes
+  -o smtpd_sasl_auth_enable=yes
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">3</div><div class="step-body">
+      <p>Cấu hình Dovecot IMAPS</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/dovecot/conf.d/10-ssl.conf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+ssl = required
+ssl_cert = &lt;/etc/ssl/certs/srv.hcmc.vn.crt
+ssl_key = &lt;/etc/ssl/private/srv.hcmc.vn.key
+ssl_ca = &lt;/etc/ssl/CA/Root-CA.crt
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/dovecot/conf.d/10-auth.conf – LDAP auth</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+disable_plaintext_auth = yes
+auth_mechanisms = plain login
+!include auth-ldap.conf.ext
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/dovecot/dovecot-ldap.conf.ext</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+hosts = 127.0.0.1
+dn = cn=admin,dc=hcmc,dc=vn
+dnpass = Qthtm!2026
+base = ou=people,dc=hcmc,dc=vn
+user_filter = (&(objectClass=inetOrgPerson)(uid=%u))
+pass_filter = (&(objectClass=inetOrgPerson)(uid=%u))
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># enable & start</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">systemctl</span> enable --now postfix dovecot
+</pre></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== DNS ==================== -->
+<div id="page-dns" class="page">
+  <div class="page-header">
+    <div class="tag linux">Linux · Debian 12.13 CUI</div>
+    <h2>dns.hcmc.vn</h2>
+    <p>192.168.1.2/24 — BIND9 DNS · Certificate Authority · Apache HTTPS · vsftpd FTP</p>
+  </div>
+
+  <!-- CA -->
+  <div class="step-group">
+    <div class="step-group-title">1 · Root Certificate Authority (OpenSSL) – LÀM TRƯỚC TIÊN</div>
+    <div class="box warn"><strong>⚠ Thứ tự quan trọng</strong>Tạo CA trước, sau đó ký cert cho tất cả servers, rồi mới cấu hình các dịch vụ TLS</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Khởi tạo CA directory structure</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># tạo CA structure</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">mkdir</span> -p /etc/ssl/CA/{certs,crl,newcerts,private,requests}
+<span class="cmd">chmod</span> 700 /etc/ssl/CA/private
+<span class="cmd">echo</span> "1000" > /etc/ssl/CA/serial
+<span class="cmd">echo</span> "1000" > /etc/ssl/CA/crlnumber
+<span class="cmd">touch</span> /etc/ssl/CA/index.txt
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Cấu hình <code>openssl.cnf</code> cho CA</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/ssl/CA/openssl.cnf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+dir               = /etc/ssl/CA
+certs             = $dir/certs
+crl_dir           = $dir/crl
+new_certs_dir     = $dir/newcerts
+database          = $dir/index.txt
+serial            = $dir/serial
+crlnumber         = $dir/crlnumber
+private_key       = $dir/private/Root-CA.key
+certificate       = $dir/Root-CA.crt
+crl               = $dir/crl/Root-CA.crl
+default_md        = sha256
+default_days      = 3650
+default_crl_days  = 365
+preserve          = no
+policy            = policy_loose
+x509_extensions   = usr_cert
+
+[ policy_loose ]
+countryName             = optional
+stateOrProvinceName     = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ req ]
+default_bits        = 2048
+default_md          = sha256
+distinguished_name  = req_distinguished_name
+x509_extensions     = v3_ca
+
+[ req_distinguished_name ]
+countryName                     = Country Name (2 letter code)
+countryName_default             = VN
+organizationName                = Organization Name
+organizationName_default        = HCMC
+commonName                      = Common Name
+
+[ v3_ca ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints       = critical, CA:true
+keyUsage               = critical, cRLSign, keyCertSign
+crlDistributionPoints  = URI:http://ca.hcmc.vn/Root-CA.crl
+authorityInfoAccess    = caIssuers;URI:http://ca.hcmc.vn/Root-CA.crt
+
+[ usr_cert ]
+basicConstraints       = CA:FALSE
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage               = critical, digitalSignature, keyEncipherment
+extendedKeyUsage       = serverAuth, clientAuth
+crlDistributionPoints  = URI:http://ca.hcmc.vn/Root-CA.crl
+authorityInfoAccess    = caIssuers;URI:http://ca.hcmc.vn/Root-CA.crt
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">3</div><div class="step-body">
+      <p>Tạo Root CA key và self-signed certificate</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># tạo CA</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Tạo private key</span>
+<span class="cmd">openssl</span> genrsa -out /etc/ssl/CA/private/Root-CA.key 4096
+<span class="cmd">chmod</span> 400 /etc/ssl/CA/private/Root-CA.key
+
+<span class="cmt"># Tạo self-signed cert (Subject: C=VN, O=HCMC, CN=Root-CA)</span>
+<span class="cmd">openssl</span> req -config /etc/ssl/CA/openssl.cnf \
+  -key /etc/ssl/CA/private/Root-CA.key \
+  -new -x509 -days 3650 -extensions v3_ca \
+  -out /etc/ssl/CA/Root-CA.crt \
+  -subj "/C=VN/O=HCMC/CN=Root-CA"
+
+<span class="cmt"># Kiểm tra</span>
+<span class="cmd">openssl</span> x509 -noout -text -in /etc/ssl/CA/Root-CA.crt | grep -E "Subject:|Issuer:|CRL|AIA"
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">4</div><div class="step-body">
+      <p>Script ký cert cho tất cả servers (dùng lại cho mỗi server)</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># ký cert – thay FQDN tương ứng</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+FQDN="fw01.hcmc.vn"   <span class="cmt"># thay: srv.hcmc.vn | dns.hcmc.vn | vpn.hcmc.vn | ...</span>
+
+<span class="cmd">openssl</span> genrsa -out /etc/ssl/CA/private/${FQDN}.key 2048
+<span class="cmd">openssl</span> req -new -key /etc/ssl/CA/private/${FQDN}.key \
+  -out /etc/ssl/CA/requests/${FQDN}.csr \
+  -subj "/C=VN/O=HCMC/CN=${FQDN}" \
+  -addext "subjectAltName=DNS:${FQDN}"
+<span class="cmd">openssl</span> ca -config /etc/ssl/CA/openssl.cnf \
+  -in /etc/ssl/CA/requests/${FQDN}.csr \
+  -out /etc/ssl/CA/certs/${FQDN}.crt \
+  -days 825 -batch
+</pre></div>
+      <p class="note">Ký cert cho: fw01.hcmc.vn, vpn.hcmc.vn, srv.hcmc.vn, dns.hcmc.vn, fw02.vnsc.vn, DC.vnsc.vn</p>
+    </div></div>
+    <div class="step"><div class="step-num linux">5</div><div class="step-body">
+      <p>Publish CRT và CRL qua HTTP (Apache)</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># setup web cho CA files</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">mkdir</span> -p /var/www/html/ca
+<span class="cmd">cp</span> /etc/ssl/CA/Root-CA.crt /var/www/html/ca/
+<span class="cmt"># Tạo CRL lần đầu</span>
+<span class="cmd">openssl</span> ca -config /etc/ssl/CA/openssl.cnf -gencrl -out /etc/ssl/CA/crl/Root-CA.crl
+<span class="cmd">cp</span> /etc/ssl/CA/crl/Root-CA.crl /var/www/html/ca/
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- DNS -->
+  <div class="step-group">
+    <div class="step-group-title">2 · BIND9 DNS Server</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Cài đặt BIND9</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># install</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install bind9 bind9utils bind9-doc -y
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Cấu hình named.conf.options (forwarder đến DC.vnsc.vn)</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/bind/named.conf.options</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># TSIG key cho DDNS (giống key trên fw01)</span>
+include "/etc/bind/ddns-key.conf";
+
+options {
+  directory "/var/cache/bind";
+  recursion yes;
+  allow-recursion { 192.168.1.0/24; 127.0.0.1; };
+  dnssec-validation no;   <span class="cmt"># disabled vì lab</span>
+  listen-on { 192.168.1.2; 127.0.0.1; };
+  forwarders { 172.16.1.1; };  <span class="cmt"># DC.vnsc.vn</span>
+  forward only;
+};
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">3</div><div class="step-body">
+      <p>Cấu hình view nội bộ và zones</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/bind/named.conf.local</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># TSIG key</span>
+include "/etc/bind/ddns-key.conf";
+
+view "internal" {
+  match-clients { 192.168.1.0/24; 127.0.0.1; };
+
+  zone "hcmc.vn" {
+    type master;
+    file "/etc/bind/zones/db.hcmc.vn";
+    allow-update { key ddns-key; };
+  };
+
+  zone "1.168.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/zones/db.192.168.1";
+    allow-update { key ddns-key; };
+  };
+};
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">4</div><div class="step-body">
+      <p>Tạo zone file hcmc.vn</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/bind/zones/db.hcmc.vn</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+$TTL 86400
+@   IN SOA  dns.hcmc.vn. admin.hcmc.vn. (
+            2026033001 ; Serial
+            3600       ; Refresh
+            1800       ; Retry
+            604800     ; Expire
+            86400 )    ; Minimum TTL
+<span class="cmt"># NS</span>
+@           IN NS   dns.hcmc.vn.
+<span class="cmt"># A Records</span>
+srv         IN A    192.168.1.1
+dns         IN A    192.168.1.2
+fw01        IN A    192.168.1.254
+<span class="cmt"># CNAME</span>
+ca          IN CNAME dns.hcmc.vn.
+www         IN CNAME dns.hcmc.vn.
+ftp         IN CNAME dns.hcmc.vn.
+monitor     IN CNAME srv.hcmc.vn.
+vpn         IN CNAME fw01.hcmc.vn.
+mail        IN CNAME srv.hcmc.vn.
+<span class="cmt"># MX</span>
+@           IN MX 10 mail.hcmc.vn.
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">5</div><div class="step-body">
+      <p>Tạo reverse zone</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/bind/zones/db.192.168.1</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+$TTL 86400
+@   IN SOA  dns.hcmc.vn. admin.hcmc.vn. (
+            2026033001 3600 1800 604800 86400)
+@           IN NS   dns.hcmc.vn.
+1           IN PTR  srv.hcmc.vn.
+2           IN PTR  dns.hcmc.vn.
+254         IN PTR  fw01.hcmc.vn.
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># check & restart</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">named-checkconf</span>
+<span class="cmd">named-checkzone</span> hcmc.vn /etc/bind/zones/db.hcmc.vn
+<span class="cmd">systemctl</span> enable --now named
+<span class="cmd">dig</span> @192.168.1.2 fw01.hcmc.vn
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- WEB -->
+  <div class="step-group">
+    <div class="step-group-title">3 · Apache – HTTPS www.hcmc.vn với Directory Auth</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <div class="code-block"><div class="code-header"><span class="filename"># install & enable modules</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install apache2 libapache2-mod-authnz-external -y
+<span class="cmd">a2enmod</span> ssl rewrite authn_core authz_core authnz_ldap
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <p>Tạo Virtual Host HTTPS với directory authentication</p>
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/apache2/sites-available/hcmc.vn.conf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+&lt;VirtualHost *:80&gt;
+  ServerName www.hcmc.vn
+  Redirect permanent / https://www.hcmc.vn/
+&lt;/VirtualHost&gt;
+
+&lt;VirtualHost *:443&gt;
+  ServerName www.hcmc.vn
+  DocumentRoot /var/www/hcmc.vn
+
+  SSLEngine on
+  SSLCertificateFile    /etc/ssl/CA/certs/dns.hcmc.vn.crt
+  SSLCertificateKeyFile /etc/ssl/CA/private/dns.hcmc.vn.key
+  SSLCACertificateFile  /etc/ssl/CA/Root-CA.crt
+
+  <span class="cmt"># Thư mục hcmcsc2026 – ADFS bằng OpenLDAP</span>
+  &lt;Directory /var/www/hcmc.vn/hcmcsc2026&gt;
+    AuthType Basic
+    AuthName "HCMC SC 2026 – LDAP Auth"
+    AuthBasicProvider ldap
+    AuthLDAPURL ldap://192.168.1.1/ou=people,dc=hcmc,dc=vn?uid
+    AuthLDAPBindDN "cn=admin,dc=hcmc,dc=vn"
+    AuthLDAPBindPassword Qthtm!2026
+    Require valid-user
+  &lt;/Directory&gt;
+
+  <span class="cmt"># Thư mục vnsc2026 – xác thực Windows AD (qua ADFS)</span>
+  &lt;Directory /var/www/hcmc.vn/vnsc2026&gt;
+    AuthType Basic
+    AuthName "VNSC 2026 – AD Auth"
+    AuthBasicProvider ldap
+    AuthLDAPURL ldap://172.16.1.1/DC=vnsc,DC=vn?sAMAccountName
+    AuthLDAPBindDN "Administrator@vnsc.vn"
+    AuthLDAPBindPassword Qthtm!2026
+    Require valid-user
+  &lt;/Directory&gt;
+
+  <span class="cmt"># Mạng 192.168.1.0/24 – không cần xác thực</span>
+  &lt;Directory /var/www/hcmc.vn&gt;
+    Require ip 192.168.1.0/24
+  &lt;/Directory&gt;
+
+&lt;/VirtualHost&gt;
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># create webroot & enable site</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">mkdir</span> -p /var/www/hcmc.vn/{hcmcsc2026,vnsc2026}
+<span class="cmd">echo</span> "&lt;h1&gt;HCMC.VN&lt;/h1&gt;" > /var/www/hcmc.vn/index.html
+<span class="cmd">a2ensite</span> hcmc.vn.conf
+<span class="cmd">systemctl</span> reload apache2
+</pre></div>
+    </div></div>
+  </div>
+
+  <!-- FTP -->
+  <div class="step-group">
+    <div class="step-group-title">4 · vsftpd FTP Server</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <div class="code-block"><div class="code-header"><span class="filename"># install</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install vsftpd -y
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num linux">2</div><div class="step-body">
+      <div class="code-block"><div class="code-header"><span class="filename">/etc/vsftpd.conf – cấu hình chính</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+listen=YES
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+chroot_local_user=YES
+allow_writeable_chroot=YES
+
+<span class="cmt"># Giới hạn user vào web-root</span>
+local_root=/var/www/hcmc.vn
+user_sub_token=$USER
+local_root=/var/www/hcmc.vn/$USER
+
+<span class="cmt"># PAM LDAP authentication</span>
+pam_service_name=vsftpd
+
+<span class="cmt"># SSL/TLS (optional)</span>
+ssl_enable=YES
+rsa_cert_file=/etc/ssl/CA/certs/dns.hcmc.vn.crt
+rsa_private_key_file=/etc/ssl/CA/private/dns.hcmc.vn.key
+</pre></div>
+      <div class="code-block"><div class="code-header"><span class="filename"># PAM LDAP config cho FTP</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install libpam-ldapd nslcd -y
+<span class="cmt"># Cấu hình nslcd.conf:</span>
+<span class="cmd">cat</span> >> /etc/nslcd.conf &lt;&lt;EOF
+uri ldap://192.168.1.1
+base dc=hcmc,dc=vn
+binddn cn=admin,dc=hcmc,dc=vn
+bindpw Qthtm!2026
+EOF
+<span class="cmd">systemctl</span> enable --now nslcd vsftpd
+</pre></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== CLIENT ==================== -->
+<div id="page-client" class="page">
+  <div class="page-header">
+    <div class="tag linux">Linux · Debian 12.13 GUI</div>
+    <h2>client.hcmc.vn</h2>
+    <p>DHCP 192.168.1.100 — LDAP Login · Firefox CA · Thunderbird</p>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">1 · LDAP Login (PAM/NSS)</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <div class="code-block"><div class="code-header"><span class="filename"># install LDAP client</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">apt</span> install libpam-ldapd nslcd libnss-ldapd -y
+
+<span class="cmt"># Cấu hình nslcd</span>
+<span class="cmd">cat</span> > /etc/nslcd.conf &lt;&lt;EOF
+uid nslcd
+gid nslcd
+uri ldap://192.168.1.1
+base dc=hcmc,dc=vn
+binddn cn=admin,dc=hcmc,dc=vn
+bindpw Qthtm!2026
+EOF
+
+<span class="cmt"># Cấu hình nsswitch</span>
+<span class="cmd">sed</span> -i 's/^passwd:.*/passwd: files ldap/' /etc/nsswitch.conf
+<span class="cmd">sed</span> -i 's/^group:.*/group: files ldap/' /etc/nsswitch.conf
+<span class="cmd">sed</span> -i 's/^shadow:.*/shadow: files ldap/' /etc/nsswitch.conf
+
+<span class="cmt"># PAM mkhomedir</span>
+<span class="cmd">pam-auth-update</span> --enable mkhomedir
+
+<span class="cmd">systemctl</span> enable --now nslcd
+<span class="cmd">id</span> james  <span class="cmt"># kiểm tra</span>
+</pre></div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">2 · Firefox – Cài CA Certificate</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Copy Root-CA.crt từ dns server về client</p>
+      <div class="code-block"><div class="code-header"><span class="filename"># copy cert</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmd">scp</span> root@192.168.1.2:/etc/ssl/CA/Root-CA.crt /home/james/Root-CA.crt
+</pre></div>
+      <p>Trong Firefox: <code>Settings → Privacy &amp; Security → View Certificates → Authorities → Import</code> → chọn <code>Root-CA.crt</code> → tick "Trust for websites"</p>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">3 · Thunderbird – Cấu hình james@hcmc.vn</div>
+    <div class="step"><div class="step-num linux">1</div><div class="step-body">
+      <p>Mở Thunderbird → Add Account → cấu hình thủ công</p>
+      <table>
+        <thead><tr><th>Field</th><th>Incoming (IMAP)</th><th>Outgoing (SMTP)</th></tr></thead>
+        <tbody>
+          <tr><td>Server</td><td>srv.hcmc.vn</td><td>srv.hcmc.vn</td></tr>
+          <tr><td>Port</td><td>993</td><td>465</td></tr>
+          <tr><td>Security</td><td>SSL/TLS</td><td>SSL/TLS</td></tr>
+          <tr><td>Auth</td><td>Normal Password</td><td>Normal Password</td></tr>
+          <tr><td>Username</td><td>james</td><td>james</td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== DC ==================== -->
+<div id="page-dc" class="page">
+  <div class="page-header">
+    <div class="tag win">Windows Server 2022 GUI</div>
+    <h2>DC.vnsc.vn</h2>
+    <p>172.16.1.1/24 — AD DS · DNS · GPO · File Server · CA · ADFS · RDS · SNMP</p>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">0 · Cấu hình ban đầu</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <p>Đặt hostname và IP tĩnh</p>
+      <div class="gui-path">Server Manager <span class="arr">→</span> <span>Local Server</span> <span class="arr">→</span> Computer Name: <span>DC</span></div>
+      <div class="gui-path">Network Adapter <span class="arr">→</span> Properties <span class="arr">→</span> IPv4: <span>172.16.1.1/24, GW: 172.16.1.254, DNS: 127.0.0.1</span></div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">1 · Active Directory Domain Services</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <p>Cài đặt và Promote Domain Controller</p>
+      <div class="gui-path">Server Manager <span class="arr">→</span> Add Roles and Features <span class="arr">→</span> <span>Active Directory Domain Services</span> <span class="arr">→</span> Install</div>
+      <div class="gui-path">Notification Flag <span class="arr">→</span> <span>Promote this server to a domain controller</span></div>
+      <div class="box info"><strong>Cấu hình ADDC</strong>
+        Add a new forest → Root domain: <strong>vnsc.vn</strong><br>
+        Forest/Domain Level: Windows Server 2016<br>
+        Global Catalog: ✓ | DNS: ✓<br>
+        DSRM Password: Qthtm!2026<br>
+        → Install (server sẽ tự restart)
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">2</div><div class="step-body">
+      <p>Tạo OUs và Groups trong ADUC</p>
+      <div class="gui-path">Server Manager <span class="arr">→</span> Tools <span class="arr">→</span> <span>Active Directory Users and Computers</span></div>
+      <div class="box info"><strong>Tạo 4 OUs dưới vnsc.vn</strong>
+        Right-click vnsc.vn → New → Organizational Unit:<br>
+        OU: <strong>Managers</strong> | <strong>Sales</strong> | <strong>Tech</strong> | <strong>Visitors</strong>
+      </div>
+      <div class="box info"><strong>Tạo Global Groups trong từng OU</strong>
+        Managers OU → New → Group → <strong>Vn_Managers</strong> (Global, Security)<br>
+        Sales OU → New → Group → <strong>Vn_Sales</strong><br>
+        Tech OU → New → Group → <strong>Vn_tech</strong><br>
+        Visitors OU → New → Group → <strong>Vn_visitor</strong>
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">3</div><div class="step-body">
+      <p>Tạo Users từ Users.xlsx – Dùng PowerShell</p>
+      <div class="code-block"><div class="code-header"><span class="filename">PowerShell – Tạo users hàng loạt</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Ví dụ tạo user mẫu – lặp lại theo file xlsx</span>
+$Password = ConvertTo-SecureString "Qthtm!2026" -AsPlainText -Force
+
+<span class="cmt"># Tạo user trong OU Managers</span>
+New-ADUser -Name "Manager01" -SamAccountName "manager01" `
+  -UserPrincipalName "manager01@vnsc.vn" `
+  -Path "OU=Managers,DC=vnsc,DC=vn" `
+  -AccountPassword $Password -Enabled $true `
+  -HomeDirectory "\\vnsc.vn\HomeFolder\manager01" `
+  -HomeDrive "H:"
+
+<span class="cmt"># Thêm vào group</span>
+Add-ADGroupMember -Identity "Vn_Managers" -Members "manager01"
+
+<span class="cmt"># Tạo Home Folder share trước:</span>
+New-Item -Path "E:\HomeFolder" -ItemType Directory
+New-SmbShare -Name "HomeFolder" -Path "E:\HomeFolder" `
+  -FullAccess "Everyone"
+</pre></div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">2 · DNS – Primary Zone tích hợp AD</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <div class="gui-path">Server Manager <span class="arr">→</span> Tools <span class="arr">→</span> <span>DNS Manager</span> <span class="arr">→</span> DC <span class="arr">→</span> Forward Lookup Zones</div>
+      <div class="box info"><strong>Zone vnsc.vn đã được tạo tự động khi Promote DC</strong><br>
+        Vào Properties → General: Type = <strong>Primary (AD-integrated)</strong> ✓<br>
+        Dynamic Updates: <strong>Secure only</strong> (chỉ domain-joined machines được đăng ký)<br>
+        DNSSEC: Sign Zone → Next → Next → Finish
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">2</div><div class="step-body">
+      <p>Thêm Conditional Forwarder cho hcmc.vn</p>
+      <div class="gui-path">DNS Manager <span class="arr">→</span> Conditional Forwarders <span class="arr">→</span> Right-click <span class="arr">→</span> <span>New Conditional Forwarder</span></div>
+      <div class="box info">DNS Domain: <strong>hcmc.vn</strong><br>
+        Master servers IP: <strong>192.168.1.2</strong><br>
+        ✓ Store in AD (replicate to all DNS servers in domain)
+      </div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">3 · File Server – Storage Pool RAID5 + NTFS Permissions</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <p>Tạo Storage Pool từ 3 HDD 5GB → Virtual Disk RAID5 → Ổ E:</p>
+      <div class="gui-path">Server Manager <span class="arr">→</span> File and Storage Services <span class="arr">→</span> <span>Storage Pools</span> <span class="arr">→</span> Tasks <span class="arr">→</span> New Storage Pool</div>
+      <div class="box info">
+        Pool Name: <strong>DataPool</strong> → chọn cả 3 disk 5GB<br>
+        → New Virtual Disk → Name: <strong>DataDisk</strong> → Layout: <strong>Parity (RAID5)</strong><br>
+        → New Volume → Drive letter: <strong>E:</strong> → Format: NTFS → Label: Data
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">2</div><div class="step-body">
+      <p>Tạo Folders và Share với ABE (Access-Based Enumeration)</p>
+      <div class="code-block"><div class="code-header"><span class="filename">PowerShell – Tạo shares</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Tạo thư mục</span>
+$folders = @("Manager","sales","tech","visitor")
+foreach ($f in $folders) {
+  New-Item "E:\data\$f" -ItemType Directory -Force
+}
+
+<span class="cmt"># Share từng folder với ABE (Access-Based Enumeration)</span>
+New-SmbShare -Name "Manager" -Path "E:\data\Manager" `
+  -FolderEnumerationMode AccessBased -FullAccess "Administrators"
+New-SmbShare -Name "sales"   -Path "E:\data\sales"   `
+  -FolderEnumerationMode AccessBased -FullAccess "Administrators"
+New-SmbShare -Name "tech"    -Path "E:\data\tech"    `
+  -FolderEnumerationMode AccessBased -FullAccess "Administrators"
+New-SmbShare -Name "visitor" -Path "E:\data\visitor" `
+  -FolderEnumerationMode AccessBased -FullAccess "Administrators"
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num win">3</div><div class="step-body">
+      <p>Cấu hình NTFS Permissions cho từng folder</p>
+      <div class="code-block"><div class="code-header"><span class="filename">PowerShell – NTFS ACL cho folder Manager</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Xóa inheritance và set permissions</span>
+$path = "E:\data\Manager"
+$acl = Get-Acl $path
+$acl.SetAccessRuleProtection($true, $false)  <span class="cmt"># disable inheritance</span>
+
+<span class="cmt"># Thêm quyền cho Vn_Managers: List + Create Folder (không delete)</span>
+$rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+  "vnsc\Vn_Managers",
+  "ReadAndExecute,CreateDirectories,ListDirectory",
+  "ContainerInherit,ObjectInherit",
+  "None", "Allow"
+)
+$acl.AddAccessRule($rule)
+Set-Acl $path $acl
+
+<span class="cmt"># Làm tương tự cho: sales→Vn_Sales, tech→Vn_tech, visitor→Vn_visitor</span>
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num win">4</div><div class="step-body">
+      <p>Folder Manager – yêu cầu thêm Claim: Title=Manager và phòng ban=Manager</p>
+      <div class="gui-path">ADAC <span class="arr">→</span> Dynamic Access Control <span class="arr">→</span> Claim Types <span class="arr">→</span> New</div>
+      <div class="box info">Tạo Claim Type: <strong>Title</strong> (từ AD attribute: title)<br>
+        Tạo Claim Type: <strong>Department</strong> (từ AD attribute: department)<br>
+        Tạo Central Access Rule: <strong>Manager Room Rule</strong> → User.Title == "Manager" AND User.Department == "Manager"<br>
+        Tạo Central Access Policy → Apply qua GPO → Computer Configuration → Windows Settings → Security Settings → Filesystem → E:\data\Manager
+      </div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">4 · Group Policy (GPO)</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <p>GPO Map ổ đĩa theo Group</p>
+      <div class="gui-path">Group Policy Management <span class="arr">→</span> vnsc.vn <span class="arr">→</span> GPO mới: <span>Drive Mapping Policy</span></div>
+      <div class="box info">
+        User Configuration → Preferences → Windows Settings → Drive Maps → New → Map Drive<br>
+        <strong>\\vnsc.vn\Manager → G:</strong> → Item-Level Targeting: Security Group = Vn_Managers<br>
+        <strong>\\vnsc.vn\sales → G:</strong> → Targeting: Vn_Sales<br>
+        <strong>\\vnsc.vn\tech → G:</strong> → Targeting: Vn_tech<br>
+        <strong>\\vnsc.vn\visitor → G:</strong> → Targeting: Vn_visitor
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">2</div><div class="step-body">
+      <p>Password Policy – Fine-Grained (PSO)</p>
+      <div class="gui-path">ADAC <span class="arr">→</span> vnsc (domain) <span class="arr">→</span> System <span class="arr">→</span> <span>Password Settings Container</span> <span class="arr">→</span> New</div>
+      <div class="box info">
+        <strong>PSO Default</strong>: Min length=5, Complexity=Yes, Precedence=30 → Apply to: Domain Users<br>
+        <strong>PSO Visitor</strong>: Min length=0, Complexity=No, Precedence=20 → Apply to: Vn_visitor<br>
+        <strong>PSO Manager</strong>: Min length=9, Complexity=Yes, Precedence=10 → Apply to: Vn_Managers
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">3</div><div class="step-body">
+      <p>Software Restriction – Block Notepad bằng Hash Rule cho Vn_Sales</p>
+      <div class="gui-path">GPO mới: <span>Sales Software Restriction</span> → Link to OU Sales</div>
+      <div class="box info">
+        Computer Config → Policies → Windows Settings → Security Settings → Software Restriction Policies → New<br>
+        Additional Rules → New Hash Rule → Browse → chọn <strong>notepad.exe</strong> từ C:\Windows\System32\<br>
+        Security Level: <strong>Disallowed</strong>
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">4</div><div class="step-body">
+      <p>Auto-enroll Certificate cho Vn_Managers (template VN_Users)</p>
+      <div class="gui-path">GPO mới: <span>Manager Cert Autoenroll</span> → Link to OU Managers</div>
+      <div class="box info">
+        User Configuration → Policies → Windows Settings → Security Settings → Public Key Policies<br>
+        → Certificate Services Client – Auto-Enrollment → Enabled<br>
+        ✓ Renew expired certs | ✓ Update certs that use templates
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">5</div><div class="step-body">
+      <p>IPsec – Encrypt traffic từ Vn_Managers đến File Server</p>
+      <div class="gui-path">GPO mới: <span>IPsec Manager Policy</span> → Link to OU Managers</div>
+      <div class="box info">
+        Computer Config → Policies → Windows Settings → Security Settings → Windows Firewall with Advanced Security<br>
+        Connection Security Rules → New Rule → Server-to-Server<br>
+        Endpoints: <strong>Vn_Managers computers</strong> ↔ <strong>DC.vnsc.vn (172.16.1.1)</strong><br>
+        Requirements: Require auth for in and out<br>
+        Auth Method: <strong>Computer Certificate</strong> from HCMC-CA<br>
+        Profile: Domain | Name: IPsec-Manager-FileServer
+      </div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">5 · Certificate Authority – Enterprise Sub CA</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <p>Cài Active Directory Certificate Services</p>
+      <div class="gui-path">Server Manager <span class="arr">→</span> Add Roles → <span>Active Directory Certificate Services</span> → Certification Authority</div>
+      <div class="box info">
+        Setup Type: <strong>Enterprise CA</strong><br>
+        CA Type: <strong>Subordinate CA</strong> (sub CA của Root-CA trên dns.hcmc.vn)<br>
+        CA Name: <strong>HCMC-CA</strong><br>
+        → Generate CSR → Save file → Copy sang dns.hcmc.vn để ký<br>
+        → Sau khi ký xong, copy cert về và Install CA Certificate
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">2</div><div class="step-body">
+      <p>Tạo Certificate Templates</p>
+      <div class="gui-path">CA Console <span class="arr">→</span> Certificate Templates <span class="arr">→</span> Manage</div>
+      <div class="box info">
+        <strong>VN_Server template</strong>: Duplicate từ "Web Server" → Rename → Subject: Supply in request → EKU: Server Auth<br>
+        <strong>VN_Users template</strong>: Duplicate từ "User" → Rename → EKU: Client Auth, Smart Card Logon<br>
+        → Publish cả 2 templates: CA → Certificate Templates → New → Certificate Template to Issue
+      </div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">6 · ADFS</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <div class="gui-path">Server Manager <span class="arr">→</span> Add Roles → <span>Active Directory Federation Services</span> → Install</div>
+      <div class="box info">
+        Configure ADFS → Create first federation server<br>
+        Service Account: gMSA hoặc domain account<br>
+        SSL Cert: Request từ HCMC-CA với CN=adfs.vnsc.vn<br>
+        Federation Service Name: <strong>adfs.vnsc.vn</strong>
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">2</div><div class="step-body">
+      <p>Thêm OpenLDAP (hcmc.vn) là Claim Provider</p>
+      <div class="gui-path">ADFS Management <span class="arr">→</span> Trust Relationships <span class="arr">→</span> Claim Provider Trusts <span class="arr">→</span> Add</div>
+      <div class="box info">
+        Import từ federation metadata URL hoặc manual:<br>
+        Display Name: <strong>OpenLDAP</strong><br>
+        LDAP URL: <strong>ldap://192.168.1.1/ou=people,dc=hcmc,dc=vn</strong><br>
+        Attribute Store Type: LDAP<br>
+        Mapping: uid → Name ID, mail → E-Mail
+      </div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">7 · Remote Desktop Services</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <div class="gui-path">Server Manager <span class="arr">→</span> Add Roles → <span>Remote Desktop Services</span></div>
+      <div class="box info">
+        Role Services: RD Session Host, RD Web Access, RD Connection Broker<br>
+        URL: <strong>https://rd.vnsc.vn/RDWeb</strong><br>
+        SSL Cert: Request cert với CN=rd.vnsc.vn từ HCMC-CA
+      </div>
+    </div></div>
+    <div class="step"><div class="step-num win">2</div><div class="step-body">
+      <p>Publish WordPad cho domain users</p>
+      <div class="gui-path">RDS <span class="arr">→</span> RemoteApp Manager <span class="arr">→</span> Add RemoteApp Programs <span class="arr">→</span> <span>WordPad</span></div>
+      <div class="box info">
+        User Assignment: <strong>Domain Users</strong><br>
+        Certificate: cert từ HCMC-CA (rd.vnsc.vn)<br>
+        ✓ Require smartcard/certificate authentication
+      </div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">8 · SNMP Agent</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <div class="gui-path">Server Manager <span class="arr">→</span> Add Features → <span>SNMP Service</span></div>
+      <div class="gui-path">Services <span class="arr">→</span> SNMP Service <span class="arr">→</span> Properties <span class="arr">→</span> Security tab</div>
+      <div class="box info">Community: <strong>public</strong> → Rights: READ ONLY<br>
+        Accept SNMP from: <strong>192.168.1.1</strong> (srv.hcmc.vn – Cacti server)
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== FW02 ==================== -->
+<div id="page-fw02" class="page">
+  <div class="page-header">
+    <div class="tag win">Windows Server 2022 CUI</div>
+    <h2>fw02.vnsc.vn</h2>
+    <p>172.16.1.254/24 · 172.16.2.254/24 · 210.103.5.2/26 — RRAS · DHCP · IKEv2 VPN</p>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">0 · Cấu hình ban đầu (PowerShell CUI)</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <div class="code-block"><div class="code-header"><span class="filename">PowerShell – IP & Hostname</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Đặt hostname</span>
+Rename-Computer -NewName "fw02" -Restart
+
+<span class="cmt"># Cấu hình IP (sau khi restart)</span>
+<span class="cmt"># Interface 1: LAN vnsc (172.16.1.x)</span>
+New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 172.16.1.254 -PrefixLength 24
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 172.16.1.1
+
+<span class="cmt"># Interface 2: LAN client (172.16.2.x)</span>
+New-NetIPAddress -InterfaceAlias "Ethernet 2" -IPAddress 172.16.2.254 -PrefixLength 24
+
+<span class="cmt"># Interface 3: WAN (Public)</span>
+New-NetIPAddress -InterfaceAlias "Ethernet 3" -IPAddress 210.103.5.2 -PrefixLength 26 -DefaultGateway 210.103.5.62
+</pre></div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">1 · RRAS – Routing, NAT, Port Redirect</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <div class="code-block"><div class="code-header"><span class="filename">PowerShell – Install RRAS</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+Install-WindowsFeature -Name Routing -IncludeManagementTools
+Install-WindowsFeature -Name RemoteAccess -IncludeAllSubFeature
+
+<span class="cmt"># Cài RRAS qua netsh (hoặc GUI nếu có Remote Desktop)</span>
+netsh routing ip nat install
+
+<span class="cmt"># Enable NAT trên interface WAN</span>
+netsh routing ip nat add interface "Ethernet 3" full
+
+<span class="cmt"># Port Redirect: HTTPS -> DC</span>
+netsh routing ip nat add portmapping "Ethernet 3" tcp 0.0.0.0 443 172.16.1.1 443
+<span class="cmt"># Port Redirect: RDWeb</span>
+netsh routing ip nat add portmapping "Ethernet 3" tcp 0.0.0.0 3389 172.16.1.1 3389
+</pre></div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">2 · DHCP Server</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <div class="code-block"><div class="code-header"><span class="filename">PowerShell – DHCP</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+Install-WindowsFeature -Name DHCP -IncludeManagementTools
+
+<span class="cmt"># Authorize DHCP</span>
+Add-DhcpServerInDC -DnsName "fw02.vnsc.vn" -IPAddress 172.16.2.254
+
+<span class="cmt"># Tạo Scope cho 172.16.2.0/24</span>
+Add-DhcpServerv4Scope -Name "VNSC Client" -StartRange 172.16.2.50 `
+  -EndRange 172.16.2.150 -SubnetMask 255.255.255.0
+
+Set-DhcpServerv4OptionValue -ScopeId 172.16.2.0 `
+  -DnsServer 172.16.1.1 -Router 172.16.2.254 `
+  -DnsDomain "vnsc.vn"
+
+<span class="cmt"># Reservation cho worker.vnsc.vn</span>
+Add-DhcpServerv4Reservation -ScopeId 172.16.2.0 `
+  -IPAddress 172.16.2.100 -ClientId "AA-BB-CC-DD-EE-FF" `
+  -Description "worker.vnsc.vn"
+</pre></div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">3 · Site-to-Site IKEv2 VPN (Windows RRAS)</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <p>Yêu cầu cert từ HCMC-CA (từ dns.hcmc.vn)</p>
+      <div class="code-block"><div class="code-header"><span class="filename">PowerShell – Request cert từ Sub CA</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Import Root CA và Sub CA cert vào Trusted Root store</span>
+Import-Certificate -FilePath "C:\certs\Root-CA.crt" `
+  -CertStoreLocation Cert:\LocalMachine\Root
+Import-Certificate -FilePath "C:\certs\HCMC-CA.crt" `
+  -CertStoreLocation Cert:\LocalMachine\CA
+
+<span class="cmt"># Request cert qua template VN_Server</span>
+$cert = Get-Certificate -Template "VN_Server" `
+  -SubjectName "CN=fw02.vnsc.vn,O=HCMC,C=VN" `
+  -CertStoreLocation Cert:\LocalMachine\My
+</pre></div>
+    </div></div>
+    <div class="step"><div class="step-num win">2</div><div class="step-body">
+      <p>Cấu hình IKEv2 S2S VPN qua RRAS</p>
+      <div class="code-block"><div class="code-header"><span class="filename">PowerShell – S2S VPN Connection</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Thêm kết nối VPN đến fw01</span>
+Add-VpnS2SInterface -Name "To-HCMC" `
+  -Destination 210.103.5.1 `
+  -Protocol IKEv2 `
+  -AuthenticationMethod MachineCertificates `
+  -IPv4Subnet @("192.168.1.0/24:100") `
+  -PassThru
+
+<span class="cmt"># Kết nối</span>
+Connect-VpnS2SInterface -Name "To-HCMC"
+Get-VpnS2SInterface -Name "To-HCMC"
+</pre></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ==================== WORKER ==================== -->
+<div id="page-worker" class="page">
+  <div class="page-header">
+    <div class="tag win">Windows 11 GUI</div>
+    <h2>worker.vnsc.vn</h2>
+    <p>DHCP 172.16.2.100 — Domain Join · Thunderbird · Test GPO/RDWeb</p>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">1 · Cấu hình cơ bản</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <p>Đặt DNS server trỏ về DC và join Domain</p>
+      <div class="gui-path">Settings <span class="arr">→</span> Network <span class="arr">→</span> Ethernet <span class="arr">→</span> Edit DNS: <span>172.16.1.1</span></div>
+      <div class="gui-path">Settings <span class="arr">→</span> System <span class="arr">→</span> About <span class="arr">→</span> <span>Domain or workgroup</span> <span class="arr">→</span> Change <span class="arr">→</span> Domain: <span>vnsc.vn</span></div>
+      <div class="box info">Nhập credential: Administrator@vnsc.vn / Qthtm!2026 → Restart</div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">2 · Import CA Certificate (không cảnh báo lỗi cert)</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <div class="code-block"><div class="code-header"><span class="filename">PowerShell (Admin) – Import CA certs</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>
+<span class="cmt"># Import Root CA</span>
+Import-Certificate -FilePath "\\DC.vnsc.vn\SYSVOL\Root-CA.crt" `
+  -CertStoreLocation Cert:\LocalMachine\Root
+
+<span class="cmt"># Hoặc qua GPO: Computer Config → Policies → Windows Settings → Security
+# → Public Key → Trusted Root Certification Authorities → Import Root-CA.crt</span>
+</pre></div>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">3 · Thunderbird – Cấu hình donald@hcmc.vn</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <p>Mở Thunderbird → Add Account → Manual setup</p>
+      <table>
+        <thead><tr><th>Field</th><th>Incoming (IMAP)</th><th>Outgoing (SMTP)</th></tr></thead>
+        <tbody>
+          <tr><td>Server</td><td>srv.hcmc.vn</td><td>srv.hcmc.vn</td></tr>
+          <tr><td>Port</td><td>993</td><td>465</td></tr>
+          <tr><td>Security</td><td>SSL/TLS</td><td>SSL/TLS</td></tr>
+          <tr><td>Username</td><td>donald</td><td>donald</td></tr>
+          <tr><td>Password</td><td>Qthtm!2026</td><td>Qthtm!2026</td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+
+  <div class="step-group">
+    <div class="step-group-title">4 · Kiểm tra GPO & File Server</div>
+    <div class="step"><div class="step-num win">1</div><div class="step-body">
+      <p>Chạy <code>gpupdate /force</code> sau khi login bằng từng tài khoản</p>
+      <ul class="checklist">
+        <li><span>Login Vn_Managers → kiểm tra ổ G: map đến \\vnsc.vn\Manager</span></li>
+        <li><span>Login Vn_Sales → kiểm tra Notepad bị block</span></li>
+        <li><span>Login Vn_visitor → password để trống được</span></li>
+        <li><span>Login Manager → mở https://rd.vnsc.vn/RDWeb → launch WordPad</span></li>
+        <li><span>Kiểm tra File Server: chỉ thấy folder của group mình</span></li>
+        <li><span>Kiểm tra cert tự động enroll cho Vn_Managers</span></li>
+      </ul>
+    </div></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  event.currentTarget.classList.add('active');
+  document.getElementById('main').scrollTop = 0;
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText || pre.textContent;
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+  });
+}
+</script>
+</body>
+</html>
